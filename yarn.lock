@@ -77,9 +77,10 @@
   version "8.5.7"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-8.5.7.tgz#9c498c35af354dcfbca3790fb2e81129e93cf0e2"
 
-"@types/node@^10.9.4":
-  version "10.11.3"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.11.3.tgz#c055536ac8a5e871701aa01914be5731539d01ee"
+"@types/node@^11.13.9":
+  version "11.13.9"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-11.13.9.tgz#f80697caca7f7fb2526527a5c5a2743487f05ccc"
+  integrity sha512-NJ4yuEVw5podZbINp3tEqUIImMSAEHaCXRiWCf3KC32l6hIKf0iPJEh2uZdT0fELfRYk310yLmMXqy2leZQUbg==
 
 "@types/uuid@^3.4.3":
   version "3.4.3"
