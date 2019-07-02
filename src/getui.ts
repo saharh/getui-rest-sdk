@@ -602,4 +602,16 @@ export class Getui {
       url: `/stop_task/${taskId}`,
     });
   }
+
+  public async verifyQuery(gyuId: string, reqId: string): Promise<any> {
+    const body = {
+      appId: this.options.appId,
+      gyuId: gyuId,
+      reqId: reqId,
+    };
+    return this.request({
+      url: '/verify_query',
+      body,
+    });
+  }
 }

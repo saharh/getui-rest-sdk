@@ -801,6 +801,22 @@ var Getui = /** @class */ (function () {
             });
         });
     };
+    Getui.prototype.verifyQuery = function (gyuId, reqId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var body;
+            return __generator(this, function (_a) {
+                body = {
+                    appId: this.options.appId,
+                    gyuId: gyuId,
+                    reqId: reqId,
+                };
+                return [2 /*return*/, this.request({
+                        url: '/verify_query',
+                        body: body,
+                    })];
+            });
+        });
+    };
     return Getui;
 }());
 exports.Getui = Getui;

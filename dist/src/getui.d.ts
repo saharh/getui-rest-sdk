@@ -211,4 +211,5 @@ export declare class Getui {
      * @param {string} taskId
      */
     stopTask(taskId: string): Promise<any>;
+    verifyQuery(gyuId: string, reqId: string): Promise<any>;
 }
