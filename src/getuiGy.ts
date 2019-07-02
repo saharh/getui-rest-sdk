@@ -57,8 +57,8 @@ export class GetuiGy {
     }
 
     const ignoreUrls = [
-      '/auth_sign',
-      '/auth_close',
+      '/gy/auth_sign',
+      '/gy/auth_close',
     ];
     if (!_.includes(ignoreUrls, params.url)) {
       await this.authSign();

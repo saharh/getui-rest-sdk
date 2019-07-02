@@ -75,8 +75,8 @@ var GetuiGy = /** @class */ (function () {
                             params.body = util_1.removeUndefined(params.body);
                         }
                         ignoreUrls = [
-                            '/auth_sign',
-                            '/auth_close',
+                            '/gy/auth_sign',
+                            '/gy/auth_close',
                         ];
                         if (!!_.includes(ignoreUrls, params.url)) return [3 /*break*/, 2];
                         return [4 /*yield*/, this.authSign()];
