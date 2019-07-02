@@ -18,6 +18,7 @@ import Getui, {
   BatchTask,
   TransmissionTemplate,
   TagMessage,
+  GetuiGy
 } from '../src';
 
 const option: GetuiOption = {
@@ -27,6 +28,7 @@ const option: GetuiOption = {
   masterSecret: process.env.GETUI_MASTER_SECRET || 'test_master_secret',
 };
 
+let gtGy: GetuiGy;
 let gt: Getui;
 const testTag = process.env.GETUI_TEST_TAG || 'test-tag';
 const testCID = process.env.GETUI_CID || 'test-cid';

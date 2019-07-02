@@ -45,6 +45,7 @@ var option = {
     appKey: process.env.GETUI_APP_KEY || 'test_app_key',
     masterSecret: process.env.GETUI_MASTER_SECRET || 'test_master_secret',
 };
+var gtGy;
 var gt;
 var testTag = process.env.GETUI_TEST_TAG || 'test-tag';
 var testCID = process.env.GETUI_CID || 'test-cid';
