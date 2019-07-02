@@ -1,8 +1,8 @@
 node_modules
-dist
 .vscode
 *.log
 *.pem
 .tmp
 *.tgz
 test.sh
+.idea
