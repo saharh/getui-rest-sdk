@@ -2,21 +2,18 @@ import {setTimeout} from 'timers';
 
 import * as _ from 'lodash';
 import * as rp from 'request-promise';
-import * as createError from 'create-error';
 import * as debug from 'debug';
+
+// rp.debug = true;
 
 import {
   sha256,
-  getRequestId,
+  // getRequestId,
   removeUndefined,
   getUserAgent
 } from './util';
 
 const log = debug('getui');
-
-// export const GetuiError = createError('GetuiError', {
-//   code: 'GETUI_ERROR',
-// });
 
 const USER_AGENT = getUserAgent();
 log(`using user agent ${USER_AGENT}`);
@@ -46,6 +43,7 @@ export class GetuiGy {
       method: 'POST',
       headers: {
         'User-Agent': USER_AGENT,
+        'Accept': '*/*',
       },
       json: true,
     });
@@ -75,22 +73,27 @@ export class GetuiGy {
     log(JSON.stringify(params.body, null, 2));
     const ret = await this.rp(params);
 
-    if (ret.result !== 'ok') throw new GetuiError(ret.result, {detail: ret});
+    if (ret == null || ret.data == null || ret.data.result !== '20000') throw new GetuiError(ret && ret.data && ret.data.result, {detail: ret});
     return ret;
   }
 
   private async startAuthSign(): Promise<void> {
     const timestamp = _.now();
     const sign = sha256(`${this.options.appKey}${timestamp}${this.options.masterSecret}`);
-    const {authToken} = await this.request({
+    const result = await this.request({
       url: `/gy/auth_sign`,
+      method: 'POST',
       body: {
-        sign,
-        timestamp,
+        sign: sign,
+        timestamp: timestamp,
         appId: this.options.appId,
       },
+      json: true
     });
-    this.authToken = authToken;
+    if (!result || !result.data || !result.data.data || !result.data.data.authToken) {
+      throw new Error('authToken not found in getAuthToken response!');
+    }
+    this.authToken = result.data.data.authToken;
     this.authTokenAcquireTime = _.now();
     log(`authToken: ${this.authToken}, authTokenAcquireTime: ${this.authTokenAcquireTime}`);
   }
@@ -140,11 +143,11 @@ export class GetuiGy {
   public async verifyQuery(gyuId: string, reqId: string): Promise<any> {
     const body = {
       appId: this.options.appId,
-      gyuId: gyuId,
+      gyuid: gyuId,
       reqId: reqId,
     };
     return this.request({
-      url: '/verify_query',
+      url: '/gy/verify_query',
       body,
     });
   }

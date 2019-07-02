@@ -38,11 +38,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var _ = require("lodash");
 var rp = require("request-promise");
 var debug = require("debug");
+// rp.debug = true;
 var util_1 = require("./util");
 var log = debug('getui');
-// export const GetuiError = createError('GetuiError', {
-//   code: 'GETUI_ERROR',
-// });
 var USER_AGENT = util_1.getUserAgent();
 log("using user agent " + USER_AGENT);
 var GETUI_BASE_URL = 'https://openapi-gy.getui.com/v1';
@@ -61,6 +59,7 @@ var GetuiGy = /** @class */ (function () {
             method: 'POST',
             headers: {
                 'User-Agent': USER_AGENT,
+                'Accept': '*/*',
             },
             json: true,
         });
@@ -95,8 +94,8 @@ var GetuiGy = /** @class */ (function () {
                         return [4 /*yield*/, this.rp(params)];
                     case 3:
                         ret = _a.sent();
-                        if (ret.result !== 'ok')
-                            throw new getui_1.GetuiError(ret.result, { detail: ret });
+                        if (ret == null || ret.data == null || ret.data.result !== '20000')
+                            throw new getui_1.GetuiError(ret && ret.data && ret.data.result, { detail: ret });
                         return [2 /*return*/, ret];
                 }
             });
@@ -104,7 +103,7 @@ var GetuiGy = /** @class */ (function () {
     };
     GetuiGy.prototype.startAuthSign = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var timestamp, sign, authToken;
+            var timestamp, sign, result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -112,15 +111,20 @@ var GetuiGy = /** @class */ (function () {
                         sign = util_1.sha256("" + this.options.appKey + timestamp + this.options.masterSecret);
                         return [4 /*yield*/, this.request({
                                 url: "/gy/auth_sign",
+                                method: 'POST',
                                 body: {
                                     sign: sign,
                                     timestamp: timestamp,
                                     appId: this.options.appId,
                                 },
+                                json: true
                             })];
                     case 1:
-                        authToken = (_a.sent()).authToken;
-                        this.authToken = authToken;
+                        result = _a.sent();
+                        if (!result || !result.data || !result.data.data || !result.data.data.authToken) {
+                            throw new Error('authToken not found in getAuthToken response!');
+                        }
+                        this.authToken = result.data.data.authToken;
                         this.authTokenAcquireTime = _.now();
                         log("authToken: " + this.authToken + ", authTokenAcquireTime: " + this.authTokenAcquireTime);
                         return [2 /*return*/];
@@ -188,11 +192,11 @@ var GetuiGy = /** @class */ (function () {
             return __generator(this, function (_a) {
                 body = {
                     appId: this.options.appId,
-                    gyuId: gyuId,
+                    gyuid: gyuId,
                     reqId: reqId,
                 };
                 return [2 /*return*/, this.request({
-                        url: '/verify_query',
+                        url: '/gy/verify_query',
                         body: body,
                     })];
             });
