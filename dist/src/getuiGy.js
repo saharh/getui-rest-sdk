@@ -64,9 +64,9 @@ var GetuiGy = /** @class */ (function () {
             json: true,
         });
     }
-    GetuiGy.prototype.request = function (params) {
+    GetuiGy.prototype.request = function (params, retry) {
         return __awaiter(this, void 0, void 0, function () {
-            var ignoreUrls, ret;
+            var ignoreUrls, nonAuthUrl, ret, resultCode;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -77,7 +77,8 @@ var GetuiGy = /** @class */ (function () {
                             '/gy/auth_sign',
                             '/gy/auth_close',
                         ];
-                        if (!!_.includes(ignoreUrls, params.url)) return [3 /*break*/, 2];
+                        nonAuthUrl = !_.includes(ignoreUrls, params.url);
+                        if (!nonAuthUrl) return [3 /*break*/, 2];
                         return [4 /*yield*/, this.authSign()];
                     case 1:
                         _a.sent();
@@ -94,8 +95,14 @@ var GetuiGy = /** @class */ (function () {
                         return [4 /*yield*/, this.rp(params)];
                     case 3:
                         ret = _a.sent();
-                        if (ret == null || ret.data == null || ret.data.result !== '20000')
-                            throw new getui_1.GetuiError(ret && ret.data && ret.data.result, { detail: ret });
+                        if (ret == null || ret.data == null || ret.data.result !== '20000') {
+                            resultCode = ret && ret.data && ret.data.result;
+                            if (!retry && nonAuthUrl && resultCode === '40028') { // auth token expired, fetch new one
+                                this.authToken = null;
+                                return [2 /*return*/, this.request(params, true)];
+                            }
+                            throw new getui_1.GetuiError(resultCode, { detail: ret });
+                        }
                         return [2 /*return*/, ret];
                 }
             });

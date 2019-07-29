@@ -49,7 +49,7 @@ export class GetuiGy {
     });
   }
 
-  private async request(params: any): Promise<any> {
+  private async request(params: any, retry?: boolean): Promise<any> {
     if (params.body) {
       params.body = removeUndefined(params.body);
     }
@@ -58,7 +58,8 @@ export class GetuiGy {
       '/gy/auth_sign',
       '/gy/auth_close',
     ];
-    if (!_.includes(ignoreUrls, params.url)) {
+    let nonAuthUrl = !_.includes(ignoreUrls, params.url);
+    if (nonAuthUrl) {
       await this.authSign();
     }
 
@@ -73,7 +74,14 @@ export class GetuiGy {
     log(JSON.stringify(params.body, null, 2));
     const ret = await this.rp(params);
 
-    if (ret == null || ret.data == null || ret.data.result !== '20000') throw new GetuiError(ret && ret.data && ret.data.result, {detail: ret});
+    if (ret == null || ret.data == null || ret.data.result !== '20000') {
+      let resultCode = ret && ret.data && ret.data.result;
+      if (!retry && nonAuthUrl && resultCode === '40028') { // auth token expired, fetch new one
+        this.authToken = null;
+        return this.request(params, true);
+      }
+      throw new GetuiError(resultCode, {detail: ret});
+    }
     return ret;
   }
 
